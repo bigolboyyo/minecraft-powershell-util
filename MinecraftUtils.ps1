@@ -44,7 +44,7 @@ function Initialize-Server {
         return 
     }
 
-    $newDirectoryName = Read-Host "Enter a name for the new server instance directory."
+    $newDirectoryName = Read-Host "Enter the name for the new server directory."
 
     $outputPathOfDirectory = Read-Host "Enter the location path to create the new server directory."
 
@@ -171,7 +171,7 @@ function Test-Existence {
         return $result
     }
 
-    [string]$stagedNewPath = Read-Host "Would you like to specify the path type? Leave blank for default. ( defaults to Container )"
+    [string]$stagedNewPath = Read-Host "Would you like to specify the path type? Leave blank to default to Container (directory)."
     
     if ($stagedNewPath -eq "") {    
         $pathType = "Container"
@@ -185,7 +185,7 @@ function Test-Existence {
         $result.Exists = $true
         Write-Host "The Path: $pathToTest is of the specified Type: $pathType. All good!"
     } else {
-        $result.ErrorMessage = "Error: Proposed path not found in the specified directory."
+        $result.ErrorMessage = "Error: The proposed path was not found in the specified directory."
     }
 
     return $result
