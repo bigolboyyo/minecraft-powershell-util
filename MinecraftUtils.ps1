@@ -68,14 +68,6 @@ function Register-Properties {
     Write-Host "Hello World!"
 }
 
-
-
-# Function to configure Minecraft server settings
-# function Configure-MinecraftServer {
-#     # Add your configuration settings here
-#     # Example: Set-Difficulty 2  # Set difficulty to Hard (0: Peaceful, 1: Easy, 2: Normal, 3: Hard)
-# }
-
 # Function to start ngrok tunnel
 function Start-Ngrok {
     $ngrokPath = "D:\ngrok\ngrok.exe"
