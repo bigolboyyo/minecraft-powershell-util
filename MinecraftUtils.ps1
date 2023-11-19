@@ -25,8 +25,6 @@ function Start-Mining {
     Invoke-Expression $command
 }
 
-
-
 # Allows you to set up a new server directory with an existing server.jar file
 function Initialize-Server {
     [CmdletBinding()]
@@ -145,4 +143,50 @@ while ($true) {
 
     Write-Host "Press Enter to continue..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+}
+
+### Util Utils
+##
+#
+# Example Usage
+# $result = Test-Existence -pathToTest "C:\Your\Path" -pathType "Container"
+
+function Test-Existence {
+    param (
+        [string]$pathToTest,
+        [string]$pathType = ""
+    )
+
+    $result = [PSCustomObject]@{
+        Path = $null
+        Type = $null
+        Exists = $false
+        ErrorMessage = $null
+    }
+
+    $pathToTest = Read-Host "Which path are you looking to test?"
+
+    if (-not $pathToTest) {
+        Write-Host "Please provide a path to test!"
+        return $result
+    }
+
+    [string]$stagedNewPath = Read-Host "Would you like to specify the path type? Leave blank for default. ( defaults to Container )"
+    
+    if ($stagedNewPath -eq "") {    
+        $pathType = "Container"
+    } else {
+        $pathType = $stagedNewPath
+    }
+
+    if (Test-Path $pathToTest) {
+        $result.Path = $pathToTest
+        $result.Type = $pathType
+        $result.Exists = $true
+        Write-Host "The Path: $pathToTest is of the specified Type: $pathType. All good!"
+    } else {
+        $result.ErrorMessage = "Error: Proposed path not found in the specified directory."
+    }
+
+    return $result
 }
