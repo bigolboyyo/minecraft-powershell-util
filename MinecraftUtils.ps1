@@ -16,6 +16,10 @@ function Start-Mining {
         return
     }
 
+    Write-Host "Please Note: If this is the first time you are running the server you will need to agree to the EULA by setting false to TRUE."
+    Start-Sleep -Seconds 2
+    1..3 | ForEach-Object { Write-Host ""}
+
     if ($arg -eq "nogui") {
         $command = "java -Xmx1024M -Xms1024M -jar `"$jarPath`" nogui"
     } else {
@@ -60,6 +64,7 @@ function Initialize-Server {
     Copy-Item -Recurse -Path "$PSScriptRoot\MinecraftUtils.ps1" -Destination $newDirectoryPath -Force
 
     Write-Host "Server setup completed. New directory: $newDirectoryPath"
+    Write-Host "A copy of these utils has been moved into the new directory as well!"
 }
 
 function Register-Properties {
@@ -116,35 +121,6 @@ function Stop-Ngrok {
     Write-Host "Ngrok Has Stopped"
 }
 
-# Main menu
-while ($true) {
-    Clear-Host
-    Write-Host "=== Minecraft Server Configuration ==="
-    Write-Host "1. Start Minecraft Server"
-    Write-Host "2. Initialize New Minecraft Server"
-    Write-Host "3. Configure Properties File"
-    Write-Host "4. Start Ngrok Tunnel"
-    Write-Host "5. Ngrok Information"
-    Write-Host "6. Stop Ngrok"
-    Write-Host "Q. Quit"
-
-    $choice = Read-Host "Enter your choice"
-
-    switch ($choice) {
-        '1' { Start-Mining }
-        '2' { Initialize-Server }
-        '3' { Register-Properties }
-        '4' { Start-Ngrok }
-        '5' { Get-NgrokInfo }
-        '6' { Stop-Ngrok }
-        'Q' { exit }
-        default { Write-Host "Invalid choice. Please try again." }
-    }
-
-    Write-Host "Press Enter to continue..."
-    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-}
-
 ### Util Utils
 ##
 #
@@ -190,3 +166,68 @@ function Test-Existence {
 
     return $result
 }
+
+# Example usage
+# Write-Lines -x 4 -symbol "=="
+
+function Write-Lines {
+    [CmdletBinding()]
+    param (
+        [int]$x,
+        [string]$symbol
+    )
+
+    if ($null -eq $x) {
+        $x = 2
+    }
+
+    if ($null -eq $symbol) {
+        $symbol = ""
+    }
+
+    1..$x | ForEach-Object { Write-Host $symbol}
+}
+
+
+# === Main menu ===
+
+while ($true) {
+    Clear-Host
+    Write-Host "Minecraft PowerShell Utils"
+    Write-Host "Repo: https://github.com/bigolboyyo/minecraft-powershell-util"
+    Write-Lines -x 1
+    Write-Host "===================================================================="
+    Write-Host "Ngrok Download: https://ngrok.com/download"
+    Write-Host "Java Download: https://www.java.com/download/ie_manual.jsp"
+    Write-Host "Minecraft Server Download: https://www.minecraft.net/en-us/download/server"
+    Write-Host "===================================================================="
+    Write-Lines -x 1
+    Write-Host "Current Path: $PSScriptRoot"
+    Write-Lines -x 1
+    Write-Host "1. Start Minecraft Server"
+    Write-Host "2. Initialize New Minecraft Server"
+    Write-Host "3. Configure Properties File"
+    Write-Host "4. Start Ngrok Tunnel"
+    Write-Host "5. Ngrok Information"
+    Write-Host "6. Stop Ngrok"
+    Write-Host "Q. Quit"
+    Write-Lines -x 1
+    $choice = Read-Host "Enter your choice"
+
+    switch ($choice) {
+        '1' { Start-Mining }
+        '2' { Initialize-Server }
+        '3' { Register-Properties }
+        '4' { Start-Ngrok }
+        '5' { Get-NgrokInfo }
+        '6' { Stop-Ngrok }
+        'Q' { exit }
+        default { Write-Host "Invalid choice. Please try again." }
+    }
+
+    Write-Host "Press Enter to continue..."
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+}
+
+
+

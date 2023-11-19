@@ -1,4 +1,11 @@
 ngrok.exe
-../server.jar
-./server.jar
 server.jar
+banned-ips.json
+banned-players.json
+libraries/
+logs/
+ops.json
+usercache.json
+versions/
+whitelist.json
+world/
