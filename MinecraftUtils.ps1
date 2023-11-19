@@ -70,7 +70,11 @@ function Register-Properties {
 
 # Function to start ngrok tunnel
 function Start-Ngrok {
-    $ngrokPath = "D:\ngrok\ngrok.exe"
+    param (
+        [string]$ngrokDirectory = (Read-Host "Enter the directory where your ngrok.exe is located")
+    )
+
+    $ngrokPath = Join-Path -Path $ngrokDirectory -ChildPath "ngrok.exe"
 
     $port = Read-Host "Enter the port for ngrok (default is 25565)"
 
