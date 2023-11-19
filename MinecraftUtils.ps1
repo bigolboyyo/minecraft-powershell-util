@@ -71,40 +71,51 @@ function Register-Properties {
 # Function to start ngrok tunnel
 function Start-Ngrok {
     param (
-        [string]$ngrokDirectory = (Read-Host "Enter the directory where your ngrok.exe is located")
+        [string]$ngrokDirectory = (Read-Host "Enter the directory where your ngrok.exe is located"),
+        [int]$port = 25565
     )
 
     $ngrokPath = Join-Path -Path $ngrokDirectory -ChildPath "ngrok.exe"
 
-    $port = Read-Host "Enter the port for ngrok (default is 25565)"
+    $portInput = Read-Host "Enter a new port number or leave blank for default (25565)"
+    if ($portInput -ne "") {
+        $port = [int]$portInput
+    }
 
     $ngrokProcess = Start-Process -FilePath $ngrokPath -ArgumentList "tcp $port" -PassThru -WindowStyle Hidden
     Start-Sleep -Seconds 2  # Allow ngrok to initialize
     $ngrokProcess
 }
 
-# Function to display ngrok information
+
+
 function Get-NgrokInfo {
-    $ngrokStatus = Invoke-RestMethod http://127.0.0.1:4040/api/tunnels
-    $ngrokInfo = $ngrokStatus.tunnels
+    try {
+        $ngrokStatus = Invoke-RestMethod http://127.0.0.1:4040/api/tunnels
+        $ngrokInfo = $ngrokStatus.tunnels 
 
-    # Convert the information to a formatted string
-    $ngrokInfoString = $ngrokInfo | ForEach-Object { "URL: $($_.public_url), Local Address: $($_.config.addr)" }
+        # Convert the information to a formatted string
+        $ngrokInfoString = $ngrokInfo | ForEach-Object { "URL: $($_.public_url), Local Address: $($_.config.addr)" }
 
-    # Display the information
-    Write-Host "Ngrok Information:"
-    Write-Host $ngrokInfoString
+        # Display the information
+        Write-Host "Ngrok Information:"
+        Write-Host $ngrokInfoString
 
-    # Copy the information to the clipboard
-    $ngrokInfoString | Set-Clipboard
+        # Copy the information to the clipboard
+        $ngrokInfoString | Set-Clipboard
 
-    Write-Host "Ngrok information copied to clipboard."
+        Write-Host "Ngrok information copied to clipboard."
+    }
+    catch {
+        Write-Host "Error retrieving Ngrok information: $_"
+    }
 }
 
 
 # Function to stop ngrok
 function Stop-Ngrok {
     Stop-Process -Name ngrok -Force -ErrorAction SilentlyContinue
+    Write-Host "Ngrok Has Stopped"
 }
 
 # Main menu
