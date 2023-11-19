@@ -1,2 +1,4 @@
 ngrok.exe
 ../server.jar
+./server.jar
+server.jar
