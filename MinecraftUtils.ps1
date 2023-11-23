@@ -17,8 +17,8 @@ function Start-Mining {
     }
 
     Write-Host "Please Note: If this is the first time you are running the server you will need to agree to the EULA by setting false to TRUE."
-    Start-Sleep -Seconds 2
     1..3 | ForEach-Object { Write-Host ""}
+    Start-Sleep -Seconds 1
 
     if ($arg -eq "nogui") {
         $command = "java -Xmx1024M -Xms1024M -jar `"$jarPath`" nogui"
@@ -67,8 +67,51 @@ function Initialize-Server {
     Write-Host "A copy of these utils has been moved into the new directory as well!"
 }
 
-function Register-Properties {
-    Write-Host "Hello World!"
+$netSettings = [PSCustomObject]@{
+	ServerIP = "your server ip"
+	ServerPort = 25565
+	MOTD = "A Minecraft Server"
+}
+
+$basicSettings = [PSCustomObject]@{
+    GameMode = "survival"
+    Difficulty = "easy"
+    Hardcore = False
+    MaxPlayers = 20
+    PVP = True
+}
+
+$adminSettings = [PSCustomObject]@{
+    AllowFlight = False
+    AllowNether = True
+    SpawnAnimals = True 
+    SpawnMonsters = True 
+    SpawnNPCs = True 
+    GenerateStructures = True 
+    LogIPs = True
+}
+
+$levelSettings = [PSCustomObject]@{
+    LevelType = "minecraft\:normal"
+    LevelSeed = ""
+}
+
+function Set-ServerProperties {
+    param (
+        [string]$propertiesDirectory = (Read-Host "Enter the directory where your server.properties file is located")
+    )
+
+    if (-not (Test-Path $propertiesDirectory -PathType Container)) {
+        Write-Host "Directory does not exist. Please provide a valid path"
+        return
+    }
+
+    $propertiesFile = Join-Path -Path $propertiesDirectory -ChildPath "server.properties"
+
+    if (-not (Test-Path $propertiesFile -PathType Leaf)) {
+        Write-Host "server.properties file not found in the specified directory."
+        return
+    }
 }
 
 # Function to start ngrok tunnel
@@ -100,7 +143,6 @@ function Get-NgrokInfo {
         # Convert the information to a formatted string
         $ngrokInfoString = $ngrokInfo | ForEach-Object { "URL: $($_.public_url), Local Address: $($_.config.addr)" }
 
-        # Display the information
         Write-Host "Ngrok Information:"
         Write-Host $ngrokInfoString
 
@@ -121,55 +163,10 @@ function Stop-Ngrok {
     Write-Host "Ngrok Has Stopped"
 }
 
-### Util Utils
-##
-#
-# Example Usage
-# $result = Test-Existence -pathToTest "C:\Your\Path" -pathType "Container"
-
-function Test-Existence {
-    param (
-        [string]$pathToTest,
-        [string]$pathType = ""
-    )
-
-    $result = [PSCustomObject]@{
-        Path = $null
-        Type = $null
-        Exists = $false
-        ErrorMessage = $null
-    }
-
-    $pathToTest = Read-Host "Which path are you looking to test?"
-
-    if (-not $pathToTest) {
-        Write-Host "Please provide a path to test!"
-        return $result
-    }
-
-    [string]$stagedNewPath = Read-Host "Would you like to specify the path type? Leave blank to default to Container (directory)."
-    
-    if ($stagedNewPath -eq "") {    
-        $pathType = "Container"
-    } else {
-        $pathType = $stagedNewPath
-    }
-
-    if (Test-Path $pathToTest) {
-        $result.Path = $pathToTest
-        $result.Type = $pathType
-        $result.Exists = $true
-        Write-Host "The Path: $pathToTest is of the specified Type: $pathType. All good!"
-    } else {
-        $result.ErrorMessage = "Error: The proposed path was not found in the specified directory."
-    }
-
-    return $result
-}
+# === Private ===
 
 # Example usage
 # Write-Lines -x 4 -symbol "=="
-
 function Write-Lines {
     [CmdletBinding()]
     param (
@@ -189,8 +186,8 @@ function Write-Lines {
 }
 
 
-# === Main menu ===
 
+# === Main menu ===
 while ($true) {
     Clear-Host
     Write-Host "Minecraft PowerShell Utils"
@@ -228,6 +225,3 @@ while ($true) {
     Write-Host "Press Enter to continue..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 }
-
-
-
