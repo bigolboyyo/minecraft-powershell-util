@@ -1,4 +1,9 @@
 # Function to start Minecraft server
+$DebugPreference = "Continue"  # Change to "SilentlyContinue" to suppress debug messages
+
+# Enable verbose output
+$VerbosePreference = "Continue"  # Change to "SilentlyContinue" to suppress verbose messages
+
 function Start-Mining {
     param (
         [string]$dir = "",
@@ -76,27 +81,27 @@ $netSettings = [PSCustomObject]@{
 $basicSettings = [PSCustomObject]@{
     GameMode = "survival"
     Difficulty = "easy"
-    Hardcore = False
+    Hardcore = $false
     MaxPlayers = 20
-    PVP = True
+    PVP = $true
 }
 
 $adminSettings = [PSCustomObject]@{
-    AllowFlight = False
-    AllowNether = True
-    SpawnAnimals = True 
-    SpawnMonsters = True 
-    SpawnNPCs = True 
-    GenerateStructures = True 
-    LogIPs = True
+    AllowFlight = $false
+    AllowNether = $true
+    SpawnAnimals = $true 
+    SpawnMonsters = $true 
+    SpawnNPCs = $true 
+    GenerateStructures = $true 
+    LogIPs = $true
 }
 
 $levelSettings = [PSCustomObject]@{
     LevelType = "minecraft\:normal"
     LevelSeed = ""
-}
+} 
 
-function Set-ServerProperties {
+function Set-PropertiesPath {
     param (
         [string]$propertiesDirectory = (Read-Host "Enter the directory where your server.properties file is located")
     )
@@ -112,6 +117,17 @@ function Set-ServerProperties {
         Write-Host "server.properties file not found in the specified directory."
         return
     }
+
+    return $propertiesFile
+}
+
+function Get-PropertiesFile {
+    param (
+        [string]$pathToProperties
+    )
+
+    $file = Get-Content -Path $pathToProperties
+    return $file
 }
 
 # Function to start ngrok tunnel
@@ -190,7 +206,8 @@ function Write-Lines {
 # === Main menu ===
 while ($true) {
     Clear-Host
-    Write-Host "Minecraft PowerShell Utils"
+    Write-Lines -x 4 -symbol ""
+    Write-Host "Minecraft PowerShell Server Util"
     Write-Host "Repo: https://github.com/bigolboyyo/minecraft-powershell-util"
     Write-Lines -x 1
     Write-Host "===================================================================="
@@ -214,7 +231,17 @@ while ($true) {
     switch ($choice) {
         '1' { Start-Mining }
         '2' { Initialize-Server }
-        '3' { Register-Properties }
+        '3' { 
+    $propertiesPath = Set-PropertiesPath
+    if ($propertiesPath -ne $null) {
+        $propertiesFile = Get-PropertiesFile -pathToProperties $propertiesPath
+
+        # Join the array elements into a single string
+        $propertiesFileString = $propertiesFile -join "`r`n"
+
+        Write-Verbose $propertiesFileString
+    }
+}
         '4' { Start-Ngrok }
         '5' { Get-NgrokInfo }
         '6' { Stop-Ngrok }
